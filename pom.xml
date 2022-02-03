@@ -13,7 +13,6 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${project.rest-assured-version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -28,6 +27,27 @@
             <version>${project.junit-version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${project.junit-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${project.jackson-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${project.jackson-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${project.jackson-version}</version>
+        </dependency>
 
 
     </dependencies>
@@ -37,6 +57,7 @@
         <maven.compiler.target>16</maven.compiler.target>
         <project.rest-assured-version>4.5.0</project.rest-assured-version>
         <project.junit-version>5.8.2</project.junit-version>
+        <project.jackson-version>2.13.1</project.jackson-version>
     </properties>
 
 </project>
