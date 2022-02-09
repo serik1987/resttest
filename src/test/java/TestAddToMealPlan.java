@@ -6,12 +6,24 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import ru.geekbrains.kozhukhov.test_spoonacular.models.AddToMealPlanInfo;
+import ru.geekbrains.kozhukhov.test_spoonacular.models.AddToMealResult;
 import ru.geekbrains.kozhukhov.test_spoonacular.models.UserDetailResponse;
 import ru.geekbrains.kozhukhov.test_spoonacular.models.UserRegistrationDetail;
+import ru.geekbrains.kozhukhov.test_spoonacular.utils.RandomGenerator;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 
@@ -31,25 +43,17 @@ public class TestAddToMealPlan{
         setUpUser();
     }
 
-    @Test
-    void addToMealPlan(){
-        AddToMealPlanInfo info = new AddToMealPlanInfo.Builder()
-                .date()
-                .slot(AddToMealPlanInfo.Slot.BREAKFAST)
-                .position(0)
-                .type(AddToMealPlanInfo.Type.PRODUCT)
-                .value(new AddToMealPlanInfo.MealValue.Builder()
-                        .id(183433)
-                        .servings(1)
-                        .title("Ahold Lasagna with Meat Sauce")
-                        .imageType(AddToMealPlanInfo.MealValue.ImageType.JPG)
-                        .build()
-                )
-                .build();
-
-        mealPlannerSpecification(true)
+    @ParameterizedTest
+    @MethodSource("addToMealPlanPositiveProvider")
+    @DisplayName("Add to meal endpoint: positive tests")
+    void addToMealPlanPositive(AddToMealPlanInfo info){
+        AddToMealResult result = mealPlannerSpecification(true)
                 .body(info)
-                .post("/mealplanner/{username}/items");
+                .post("/mealplanner/{username}/items")
+                .getBody()
+                .as(AddToMealResult.class);
+
+        MatcherAssert.assertThat(result.getId(), Matchers.greaterThanOrEqualTo(0));
     }
 
     private static void setUpSpecifications(){
@@ -77,9 +81,9 @@ public class TestAddToMealPlan{
     static void setUpUser(){
 
         UserRegistrationDetail userRegistrationDetail = new UserRegistrationDetail.Builder()
-                .setUsername("sergei")
-                .setFirstName("Сергей")
-                .setLastName("Кожухов")
+                .setUsername(RandomGenerator.username())
+                .setFirstName(RandomGenerator.username())
+                .setLastName(RandomGenerator.username())
                 .setEmail("serik1987@gmail.com")
                 .build();
 
@@ -105,6 +109,50 @@ public class TestAddToMealPlan{
             spec = spec.log().all();
         }
         return spec.given();
+    }
+
+    private static Stream<AddToMealPlanInfo> addToMealPlanPositiveProvider(){
+        return Stream.of(
+
+                new AddToMealPlanInfo.Builder()
+                        .date(1984, 1, 1)
+                        .slot(AddToMealPlanInfo.Slot.BREAKFAST)
+                        .position(0)
+                        .type(AddToMealPlanInfo.Type.PRODUCT)
+                        .value(new AddToMealPlanInfo.MealValue.Builder()
+                                .id(1)
+                                .servings(0)
+                                .title("")
+                                .imageType(AddToMealPlanInfo.MealValue.ImageType.JPG)
+                                .build())
+                        .build(),
+
+                new AddToMealPlanInfo.Builder()
+                        .date()
+                        .slot(AddToMealPlanInfo.Slot.LUNCH)
+                        .position(1)
+                        .type(AddToMealPlanInfo.Type.MENU_ITEM)
+                        .value(new AddToMealPlanInfo.MealValue.Builder()
+                                .id(19028)
+                                .servings(0)
+                                .title("x")
+                                .imageType(AddToMealPlanInfo.MealValue.ImageType.PNG)
+                                .build()
+                        )
+                        .build(),
+
+                new AddToMealPlanInfo.Builder()
+                        .date(2024, 1, 1)
+                        .slot(AddToMealPlanInfo.Slot.DINNER)
+                        .position(-1)
+                        .type(AddToMealPlanInfo.Type.RECIPE)
+                        .value(new AddToMealPlanInfo.MealValue.Builder()
+                                .id(34904)
+                                .servings(0)
+                                .title("==========")
+                                .build())
+                        .build()
+        );
     }
 
 }
